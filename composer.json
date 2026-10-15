@@ -1,0 +1,128 @@
+{
+    "name": "agencelex/notifications-slack",
+    "description": "Slack channel (Block Kit, legacy attachments, Incoming Webhooks and Web API) for Agence Lex Notifications on TYPO3",
+    "type": "typo3-cms-extension",
+    "license": "GPL-2.0-or-later",
+    "keywords": [
+        "TYPO3",
+        "notifications",
+        "notification system",
+        "slack",
+        "slack notifications",
+        "slack integration",
+        "slack channel",
+        "slack webhook",
+        "slack api",
+        "slack block kit",
+        "slack legacy attachments",
+        "slack incoming webhooks",
+        "slack web api"
+    ],
+    "homepage": "https://github.com/agencelex/typo3-notifications-slack",
+    "authors": [
+        {
+            "name": "Agence Lex",
+            "email": "contact@agencelex.com",
+            "role": "Agency",
+            "homepage": "https://www.agencelex.com/"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/agencelex/typo3-notifications-slack/issues"
+    },
+    "repositories": {
+        "local-extensions": {
+            "type": "path",
+            "url": "packages/*"
+        },
+        "composer": {
+            "type": "composer",
+            "url": "https://composer.typo3.org/"
+        }
+    },
+    "require": {
+        "php": "^8.2",
+        "ext-json": "*",
+        "typo3/cms-core": "^13.4 || ^14.3",
+        "agencelex/notifications": "^1.5",
+        "slack-php/slack-block-kit": "^2.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "Lex\\Notifications\\Slack\\": "Classes/"
+        }
+    },
+    "config": {
+        "vendor-dir": ".Build/vendor",
+        "bin-dir": ".Build/bin",
+        "optimize-autoloader": true,
+        "sort-packages": true,
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true,
+            "tbachert/spi": true,
+            "typo3/class-alias-loader": true,
+            "typo3/cms-composer-installers": true
+        }
+    },
+    "require-dev": {
+        "phpstan/extension-installer": "^1.4",
+        "phpunit/phpunit": "^11.2 || ^12.1",
+        "saschaegerer/phpstan-typo3": "^1.10 || ^2.0 || ^3.0",
+        "symfony/var-dumper": "^7.0",
+        "typo3/cms-backend": "^13.4 || ^14.3",
+        "typo3/cms-extbase": "^13.4 || ^14.3",
+        "typo3/cms-fluid": "^13.4 || ^14.3",
+        "typo3/cms-frontend": "^13.4 || ^14.3",
+        "typo3/coding-standards": "^0.8 || ^0.9",
+        "typo3/testing-framework": "^8.2 || ^9.0"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Lex\\Notifications\\Slack\\Tests\\": "Tests"
+        }
+    },
+    "extra": {
+        "typo3/cms": {
+            "app-dir": ".Build",
+            "web-dir": ".Build/public",
+            "extension-key": "notifications_slack"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "scripts": {
+        "cgl": [
+            "php-cs-fixer --diff -v fix"
+        ],
+        "cgl:ci": [
+            "php-cs-fixer --diff -v --dry-run fix"
+        ],
+        "phpstan": [
+            "phpstan analyze --configuration Build/phpstan.neon"
+        ],
+        "phpstan:baseline": [
+            "phpstan analyze --configuration Build/phpstan.neon --generate-baseline Build/phpstan-baseline.neon"
+        ],
+        "test": [
+            "@test:php:lint",
+            "@test:php:unit",
+            "@test:php:functional",
+            "@test:php:acceptance"
+        ],
+        "test:php:acceptance": [
+            "rm -rf .Build/public/typo3temp/var/tests",
+            "phpunit -c Build/phpunit-acceptance.xml"
+        ],
+        "test:php:functional": [
+            "phpunit -c Build/phpunit-functional.xml"
+        ],
+        "test:php:lint": [
+            "phplint"
+        ],
+        "test:php:unit": [
+            "phpunit -c Build/phpunit-unit.xml"
+        ]
+    }
+}

@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        # Calculate the required dependencies from type declarations of the constructor and inject methods.
+        autowire: true
+        # Automatically add symfony service tags based on implemented interfaces or base classes.
+        autoconfigure: true
+        public: false
+
+    Lex\Notifications\Slack\:
+        resource: '../Classes/*'
+        exclude:
+            - '../Classes/Message/*'
+            - '../Classes/Domain/*'
+            - '../Classes/Exception/*'
+            - '../Classes/Configuration/SlackRoute.php'
