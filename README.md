@@ -160,6 +160,21 @@ composer test:php:acceptance
 
 The script clears `.Build/public/typo3temp/var/tests` first: on exFAT volumes the testing framework cannot remove previous test instances.
 
+### Live tests against a real Slack workspace
+
+`Tests/Functional/SlackLiveTest.php` posts **real** messages (webhook, named webhook, bot message to a channel, Block Kit, thread reply and broadcast, DM to a user, legacy attachment) and checks real error answers (`channel_not_found`, `invalid_auth`). It belongs to the `live-slack` group, which `Build/phpunit-functional.xml` excludes, so it only runs when requested. Each test is skipped when its variables are missing.
+
+```bash
+export SLACK_TEST_WEBHOOK_URL='https://hooks.slack.com/services/…'  # Incoming Webhook
+export SLACK_TEST_BOT_TOKEN='xoxb-…'                                # app with chat:write
+export SLACK_TEST_CHANNEL_ID='C…'                                   # the bot must be a member
+export SLACK_TEST_USER_ID='U…'                                      # optional: DM from the bot
+# export SLACK_TEST_API_ENDPOINT='https://slack-gov.com/api'        # optional: GovSlack
+.Build/bin/phpunit -c Build/phpunit-functional.xml --group live-slack
+```
+
+Use a dedicated test channel and app. Slack limits `chat.postMessage` to about one message per second per channel; the tests never retry.
+
 PHPUnit uses `Tests/bootstrap.php`. Unit tests mock TYPO3 RequestFactory and do not make Slack API calls. Run integration tests on **both TYPO3 13.4 and TYPO3 14.3** before deploying. PHP 8.2/8.3/8.4 support must be checked against the exact installed CMS and PHPUnit versions.
 
 ## Development

@@ -54,6 +54,9 @@ Layout:
   `Fixtures/Http/FakeSlack` = Guzzle handler in `TYPO3_CONF_VARS['HTTP']['handler']` (records requests, queue responses).
   Use `overrideSlackConfiguration()` BEFORE the first `get()`/`dispatcher()` (services are instantiated lazily).
   exFAT: stale instances in `.Build/public/typo3temp/var/tests` can't be removed by the framework; delete them and `._*` files under `Tests/`.
+- `Tests/Functional/SlackLiveTest.php`: REAL Slack, group `live-slack` (excluded in phpunit-functional.xml; run with `--group live-slack`).
+  Env `SLACK_TEST_WEBHOOK_URL`, `SLACK_TEST_BOT_TOKEN`, `SLACK_TEST_CHANNEL_ID`, optional `SLACK_TEST_USER_ID`, `SLACK_TEST_API_ENDPOINT`.
+  Skips before booting TYPO3 when no var is set (custom tearDown guards that). Never run it without the user asking: it posts messages.
 - Conventions: PHPUnit attributes (`#[Test]`), `createStub()` when no expectations (PHPUnit 12 notices), `final` test classes.
   Supported: testing-framework ^8.2 || ^9, PHPUnit ^11.2 || ^12.1.
 

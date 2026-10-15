@@ -28,6 +28,12 @@
 			<directory>../Tests/Functional</directory>
 		</testsuite>
 	</testsuites>
+	<!-- SlackLiveTest posts to a real Slack workspace: excluded here, run it explicitly with the CLI option group=live-slack -->
+	<groups>
+		<exclude>
+			<group>live-slack</group>
+		</exclude>
+	</groups>
 	<source>
 		<include>
 			<directory suffix=".php">../Classes/</directory>
