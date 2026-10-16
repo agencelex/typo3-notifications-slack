@@ -29,13 +29,6 @@ Example configuration
         'connectTimeout' => 5,
     ];
 
-..  important::
-
-    The ``lex_notifications_slack`` name appears in older discussions,
-    but the source release sets its TYPO3 extension key to
-    ``notifications_slack`` in ``composer.json`` and ``Extension::KEY``.
-    Use **``notifications_slack``** in ``TYPO3_CONF_VARS``.
-
 Configuration options
 =====================
 
@@ -43,7 +36,7 @@ Configuration options
     :header: "Key", "Type / default", "Purpose"
     :widths: 24, 25, 51
 
-    "``botToken``", "string / required for API", "Slack Bot Token, read when an API message is sent."
+    "``botToken``", "string", "Slack Bot Token, read when an API message is sent but the token is not explicitly specified."
     "``webhooks``", "array / empty", "Map of safe alias names to complete HTTPS webhook URLs."
     "``apiEndpoint``", "string / ``https://slack.com/api``", "Slack API root; GovSlack: ``https://slack-gov.com/api``."
     "``timeout``", "integer / 10", "Overall HTTP request timeout (seconds)."

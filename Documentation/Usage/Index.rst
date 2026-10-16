@@ -19,6 +19,7 @@ Create a notification
 
     namespace Vendor\Site\Notification;
 
+    use Lex\Notifications\Slack\Extension;
     use Lex\Notifications\Notification;
     use Lex\Notifications\Slack\Domain\Model\Ability\CanSendToSlack;
     use Lex\Notifications\Slack\Message\SlackMessage;
@@ -29,7 +30,7 @@ Create a notification
 
         public function via(object $notifiable): array
         {
-            return ['slack'];
+            return [Extension::CHANNEL_NAME];
         }
 
         public function toSlack(object $notifiable): SlackMessage
@@ -43,7 +44,7 @@ Create a notification
 Send on demand
 ==============
 
-Inject ``Lex\\Notifications\\NotificationManager`` into an application
+Inject ``Lex\\Notifications\\NotificationDispatcherInterface`` into an application
 service and choose a route:
 
 ..  code-block:: php
@@ -54,19 +55,19 @@ service and choose a route:
 
     namespace Vendor\Site\Service;
 
-    use Lex\Notifications\NotificationManager;
+    use Lex\Notifications\NotificationDispatcherInterface;
     use Lex\Notifications\Slack\Configuration\SlackRoute;
     use Vendor\Site\Notification\DeploymentCompleted;
 
     final readonly class DeploymentReporter
     {
         public function __construct(
-            private NotificationManager $notifications,
+            private NotificationDispatcherInterface $dispatcher,
         ) {}
 
         public function report(): void
         {
-            $this->notifications
+            $this->dispatcher
                 ->route('slack', SlackRoute::webhookNamed('monitoring'))
                 ->notify(new DeploymentCompleted());
         }
@@ -77,11 +78,10 @@ To send via the Web API instead, use:
 ..  code-block:: php
 
     $this->notifications
-        ->route('slack', SlackRoute::api('C0123456789'))
+        ->route('slack', SlackRoute::api('C0123456789', 'a_bot_token'))
         ->notify(new DeploymentCompleted());
 
-The Bot Token is obtained from :ref:`TYPO3 configuration <slack-configuration>`;
-do not supply it with the notification.
+The Bot Token is not supplied when building the SlackRoute, it is obtained from :ref:`TYPO3 configuration <slack-configuration>`.
 
 Send from a notifiable model
 ============================

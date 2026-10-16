@@ -48,7 +48,7 @@ SlackRoute factory methods
 
     "``webhook(string $url)``", "Validate and store a direct webhook URL."
     "``webhookNamed(string $name)``", "Store a configuration alias."
-    "``api(string $channel)``", "Validate and store a Slack ID."
+    "``api(string $channel, ?string $token = null)``", "Validate and store a Slack ID."
     "``fromString(string $value)``", "Interpret a direct HTTPS URL, ``webhook:name`` or API ID."
     "``assertWebhookUrl(string $url)``", "Validate the Slack/GovSlack HTTPS URL; throws on failure."
 

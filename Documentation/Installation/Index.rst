@@ -23,17 +23,6 @@ From the TYPO3 project root, run:
     composer require agencelex/notifications-slack:^1.0
     vendor/bin/typo3 cache:flush
 
-..  note::
-
-    If the package is not yet available in your configured Composer
-    repositories, add the package's Git repository or a local path repository
-    before running ``composer require``. The extension source alone does not
-    install the third-party Block Kit dependency.
-
-The Composer package identifies itself as extension key
-``notifications_slack``. Ensure the main ``lex_notifications`` extension
-is installed and active as well.
-
 Configure Slack
 ===============
 

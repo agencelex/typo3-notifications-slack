@@ -1,7 +1,7 @@
 ..  _start:
 
 ===============================
-LEX Notifications: Slack Channel
+Laravel-style Notification System - Slack Channel
 ===============================
 
 Send notifications from TYPO3 to Slack using Incoming Webhooks or the

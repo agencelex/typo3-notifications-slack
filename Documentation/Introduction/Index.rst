@@ -5,7 +5,7 @@ Overview
 ========
 
 The ``notifications_slack`` TYPO3 extension provides the ``slack``
-channel for `LEX Notifications <https://github.com/agencelex/typo3-notifications>`__.
+channel for `Lex Notifications <https://github.com/agencelex/typo3-notifications>`__.
 It converts a notification's ``toSlack()`` result into an HTTPS request
 using TYPO3's HTTP ``RequestFactory``.
 

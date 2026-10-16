@@ -1,20 +1,31 @@
-# LEX Notifications — Slack channel
+# Laravel-style Notification System - Slack Channel
+
+Slack channel provider for [lex_notifications](https://github.com/agencelex/typo3-notifications). Send notifications from TYPO3 to Slack using **Incoming Webhooks** or the **Slack Web API**. Compose **messages** using **plain text**, **legacy attachments**, **Block Kit** PHP objects, or **JSON** copied from Slack's Block Kit Builder.
 
 TYPO3 13.4 / 14.3+, PHP 8.2+, `lex_notifications` 1.5+, and `slack-php/slack-block-kit` 2.3+.
 
-Supports Slack `chat.postMessage` (Bot Token), HTTPS Incoming Webhooks, GovSlack, plain text / mrkdwn, legacy attachments, native PHP Block Kit objects, **raw JSON pasted from Block Kit Builder**, thread replies and queued delivery via `lex_notifications`.
+Supports Slack `chat.postMessage` (Bot Token), HTTPS Incoming Webhooks, GovSlack, plain text / mrkdwn, legacy attachments, native PHP Block Kit objects, **raw JSON pasted from Block Kit Builder**.
 
-> **Status:** Initial 1.0.0 source release. Syntax/smoke checks are performed during packaging. Run Composer and PHPUnit in your actual TYPO3 installation before production. No real Slack delivery is performed by the unit tests.
+---
+
+## Requirements
+
+| Requirement | Version |
+|-------------|---------|
+| PHP | `^8.2` |
+| TYPO3 | `^13.4 \|\| ^14.3` |
+| agencelex/notifications | `^1.5` |
+| slack-php/slack-block-kit | `^2.3` |
+
+---
 
 ## Install
 
 ```bash
 composer require agencelex/notifications-slack:^1.0
-# or during local package evaluation, add a Composer path repository and require this package
-vendor/bin/typo3 cache:flush
 ```
 
-This package expects Composer mode to install the third-party Block Kit library. You may need to publish the package or use a path repository first; the command above is not a claim that it is already publicly distributed.
+Activate the extension in the TYPO3 Extension Manager or via `composer` (Composer-mode installations activate it automatically).
 
 ## Configuration
 
@@ -32,7 +43,7 @@ $GLOBALS['TYPO3_CONF_VARS']['EXTENSIONS']['notifications_slack'] = [
 ];
 ```
 
-Only put secrets into environment variables (or a protected secret provider). The example loads them into `$GLOBALS` at bootstrap. Treat configuration/debug dumps as sensitive. Ensure both HTTP (PHP-FPM) and queue workers can resolve secrets. The service reads the configuration when sending. Named webhooks are strongly recommended for queued notifications.
+Only put secrets into environment variables (or a protected secret provider). The example loads them into `$GLOBALS` at bootstrap. Treat configuration/debug dumps as sensitive. The service reads the configuration when sending. Named webhooks are strongly recommended for queued notifications.
 
 ### Slack setup
 
@@ -43,6 +54,7 @@ Only put secrets into environment variables (or a protected secret provider). Th
 ## Send via `NotificationManager` (on demand)
 
 ```php
+use Lex\Notifications\Slack\Extension;
 use Lex\Notifications\Notification;
 use Lex\Notifications\NotificationManager;
 use Lex\Notifications\Slack\Configuration\SlackRoute;
@@ -50,7 +62,7 @@ use Lex\Notifications\Slack\Message\SlackMessage;
 
 final class JobFinished extends Notification
 {
-    public function via(object $notifiable): array { return ['slack']; }
+    public function via(object $notifiable): array { return [Extension::CHANNEL_NAME]; }
 
     public function toSlack(object $notifiable): SlackMessage
     {
@@ -58,11 +70,12 @@ final class JobFinished extends Notification
     }
 }
 
-// Inject NotificationManager using TYPO3 DI:
-$manager->route('slack', SlackRoute::webhookNamed('monitoring'))->notify(new JobFinished());
-$manager->route('slack', SlackRoute::api('C0123456789'))->notify(new JobFinished());
+// Inject NotificationDispatcherInterface using TYPO3 DI:
+$dispatcher->route(Extension::CHANNEL_NAME, SlackRoute::webhookNamed('monitoring'))->notify(new JobFinished());
+$dispatcher->route(Extension::CHANNEL_NAME, SlackRoute::api('C0123456789'))->notify(new JobFinished());
 // shorthand:
-$manager->route('slack', 'webhook:monitoring')->notify(new JobFinished());
+$dispatcher->route(Extension::CHANNEL_NAME, 'https://hooks.slack.com/services/...')->notify(new JobFinished());
+$dispatcher->route(Extension::CHANNEL_NAME, 'webhook:monitoring')->notify(new JobFinished());
 ```
 
 `NotificationManager::route()` checks channel registration before dispatching. Do not define a message-only destination: the notification core checks the notifiable route **before** building Slack content.
@@ -81,7 +94,7 @@ final class MyRecipient
 
     public function routeNotificationForSlack(?Notification $notification = null): SlackRoute|string|null
     {
-        return SlackRoute::webhookNamed('monitoring');
+        return SlackRoute::webhookNamed('monitoring'); // Or any logic to determine the route
     }
 }
 
@@ -91,6 +104,8 @@ final class MyRecipient
 ## Message examples
 
 ### Block Kit Builder JSON (without building classes)
+
+Generate your message using the [Block Kit Builder](https://api.slack.com/block-kit-builder), then copy the JSON and use it in your code.
 
 ```php
 $builderJson = <<<'JSON'
@@ -130,7 +145,7 @@ $message = SlackMessage::text('Update')->inThread('1729000000.123456')->withoutU
 ## Security & errors
 
 - `SlackRoute::webhookNamed('monitoring')` resolves the URL at delivery time; queued objects contain only its alias. Direct `SlackRoute::webhook($url)` is supported but **serializes a secret** into queued messages.
-- API tokens are resolved at send time from TYPO3 configuration. `SlackMessage` forbids channel/token payload overrides.
+- API tokens are resolved at send time.
 - HTTP requests disable redirects, use 5 s connection/10 s total timeouts by default, and do not expose raw HTTP exception details. Webhook responses must contain `ok`; API responses must contain JSON `ok: true`.
 - `SlackTransportException` exposes `httpStatus`, `retryAfterSeconds`, and `retryable`. The extension does NOT itself implement automatic retries, and Symfony Messenger does not automatically use `retryAfterSeconds`. Set up transport retry policy separately. Unknown delivery can duplicate messages on retry.
 - Transport `send()` returns Slack API acknowledgement; notification channel interface returns `void` per the core contract.

@@ -8,7 +8,7 @@ Slack routing is independent of the message content. It is selected via
 ``NotificationManager::route()``, ``NotificationManager::routes()``, or a
 notifiable's ``routeNotificationForSlack()`` method.
 
-Three route styles
+Four route styles
 ==================
 
 ..  csv-table::
@@ -17,7 +17,8 @@ Three route styles
 
     "Named webhook", "``SlackRoute::webhookNamed('monitoring')``", "Recommended for queued delivery; no URL secret in the route object."
     "Direct webhook", "``SlackRoute::webhook($url)``", "Approved HTTPS Slack URL; the URL is a secret."
-    "Web API", "``SlackRoute::api('C0123456789')``", "Requires a configured Bot Token."
+    "Web API", "``SlackRoute::api('C0123456789', '_optional_token_')``", "Supply the token here otherwise the engine will get it from the extension configuration."
+    "url as string", "``SlackRoute::fromString($url)`` or ``SlackRoute::fromString(webhook:_name_)``", "The engine will try to guess whether it's an Incoming webhook and an API"
 
 Named webhooks
 ==============
@@ -54,7 +55,7 @@ Slack Web API
 
 ..  code-block:: php
 
-    $manager->route('slack', SlackRoute::api('C0123456789'))
+    $manager->route('slack', SlackRoute::api('C0123456789', '_optional_token_'))
         ->notify(new SecurityAlert());
 
     // An ID string is also accepted:
