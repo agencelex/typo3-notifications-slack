@@ -12,8 +12,9 @@ use Lex\Notifications\Slack\Extension;
 final readonly class SlackRoute
 {
     private function __construct(
-        public string $transport,
-        public string $destination,
+        public string  $transport,
+        public string  $destination,
+        public ?string $token = null,
     ) {}
 
     public static function webhook(string $url): self
@@ -30,13 +31,14 @@ final readonly class SlackRoute
         return new self('webhook_named', $name);
     }
 
-    public static function api(string $channel): self
+    public static function api(string $channel, ?string $token = null): self
     {
         // Require a conversation ID instead of ambiguous or renamed channel names.
         if (!preg_match('/^[CDGUW][A-Z0-9]{2,}$/D', $channel)) {
             throw new InvalidArgumentException('Slack API route requires a channel/conversation/user ID.');
         }
-        return new self(Extension::TRANSPORT_NAME_API, $channel);
+
+        return new self(Extension::TRANSPORT_NAME_API, $channel, $token);
     }
 
     public static function fromString(string $value): self
