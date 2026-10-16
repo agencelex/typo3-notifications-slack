@@ -33,7 +33,11 @@ final readonly class SlackTransport
         } elseif ($route->transport === 'api') {
             $url = $this->configuration->apiEndpoint();
             $payload['channel'] = $route->destination;
-            $headers['Authorization'] = 'Bearer ' . $this->configuration->botToken();
+            $token = $route->token ?? $this->configuration->botToken();
+            if(empty($token)) {
+                throw new SlackTransportException('Slack API route requires an authentication token.');
+            }
+            $headers['Authorization'] = 'Bearer ' . $token;
         } else {
             throw new SlackTransportException('Unknown Slack transport configuration.');
         }
